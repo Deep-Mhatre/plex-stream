@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Link } from 'react-router-dom';
 import { getHeroMovie, getMovieTrailers } from '@/services/tmdbAPI';
 import { trackTrailerView } from '@/services/userBehaviorService';
+import { useAuth } from "@clerk/clerk-react";
 
 const Hero = () => {
   const [heroData, setHeroData] = useState(null);
@@ -13,9 +14,7 @@ const Hero = () => {
   const [loading, setLoading] = useState(true);
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [selectedTrailer, setSelectedTrailer] = useState(null);
-
-  // Mock user ID - in a real app, you would get this from authentication
-  const mockUserId = "user123";
+  const { userId, getToken } = useAuth();
 
   useEffect(() => {
     const fetchHeroMovie = async () => {
@@ -39,14 +38,15 @@ const Hero = () => {
     fetchHeroMovie();
   }, []);
 
-  const handlePlayTrailer = () => {
+  const handlePlayTrailer = async () => {
     if (trailers.length > 0) {
       setSelectedTrailer(trailers[0]);
       setTrailerOpen(true);
       
       // Track that the user watched a trailer
-      if (heroData) {
-        trackTrailerView(mockUserId, heroData.id, heroData.title);
+      if (heroData && userId) {
+        const token = await getToken();
+        trackTrailerView(userId, heroData.id, heroData.title, token);
       }
     }
   };

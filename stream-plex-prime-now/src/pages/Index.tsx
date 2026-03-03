@@ -4,15 +4,14 @@ import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import ContentRow from '@/components/ContentRow';
-import WatchableContentRow from '@/components/WatchableContentRow';
 import Footer from '@/components/Footer';
 import { 
   getTrendingMovies, 
   getFeaturedMovies, 
   getPopularTVShows, 
+  getNowPlayingMovies,
   getTopRatedMovies,
-  getTopRatedTVShows,
-  getBestMoviesOfAllTime
+  getTopRatedTVShows
 } from '@/services/tmdbAPI';
 import { toast } from 'sonner';
 
@@ -72,22 +71,22 @@ const Index = () => {
     }
   });
 
-  const { data: bestMovies, isLoading: bestMoviesLoading, error: bestMoviesError } = useQuery({
-    queryKey: ['bestMovies'],
-    queryFn: getBestMoviesOfAllTime,
+  const { data: nowPlayingMovies, isLoading: nowPlayingLoading, error: nowPlayingError } = useQuery({
+    queryKey: ['nowPlayingMovies'],
+    queryFn: getNowPlayingMovies,
     meta: {
       onError: (error) => {
-        console.error("Error fetching best movies of all time:", error);
-        toast.error("Failed to load best movies of all time.");
+        console.error("Error fetching now playing movies:", error);
+        toast.error("Failed to load now playing movies.");
       }
     }
   });
 
   const isLoading = featuredLoading || trendingLoading || tvShowsLoading || 
-                    topMoviesLoading || topTVShowsLoading || bestMoviesLoading;
+                    topMoviesLoading || topTVShowsLoading || nowPlayingLoading;
   
   const hasError = featuredError || trendingError || tvShowsError || 
-                  topMoviesError || topTVShowsError || bestMoviesError;
+                  topMoviesError || topTVShowsError || nowPlayingError;
 
   return (
     <div className="min-h-screen bg-background">
@@ -112,10 +111,11 @@ const Index = () => {
           </div>
         ) : (
           <>
-            <WatchableContentRow 
-              title="Best Movies of All Time" 
-              items={Array.isArray(bestMovies) ? bestMovies : []} 
-              slug="movies/best"
+            <ContentRow 
+              title="Now Playing" 
+              items={Array.isArray(nowPlayingMovies) ? nowPlayingMovies : []} 
+              type="movie"
+              slug="movies/now-playing"
             />
           
             <ContentRow 

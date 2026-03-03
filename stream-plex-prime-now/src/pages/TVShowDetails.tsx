@@ -9,6 +9,7 @@ import Footer from '@/components/Footer';
 import { getTVShowDetails, getTVShowTrailers } from '@/services/tmdbAPI';
 import { trackTrailerView } from '@/services/userBehaviorService';
 import { toast } from 'sonner';
+import { useAuth } from "@clerk/clerk-react";
 
 const TVShowDetails = () => {
   const { id } = useParams();
@@ -17,9 +18,7 @@ const TVShowDetails = () => {
   const [loading, setLoading] = useState(true);
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [selectedTrailer, setSelectedTrailer] = useState(null);
-
-  // Mock user ID - in a real app, you would get this from authentication
-  const mockUserId = "user123";
+  const { userId, getToken } = useAuth();
 
   useEffect(() => {
     const fetchTVShow = async () => {
@@ -46,13 +45,14 @@ const TVShowDetails = () => {
     fetchTVShow();
   }, [id]);
 
-  const handlePlayTrailer = (trailer) => {
+  const handlePlayTrailer = async (trailer) => {
     setSelectedTrailer(trailer);
     setTrailerOpen(true);
     
     // Track that the user watched a trailer
-    if (show) {
-      trackTrailerView(mockUserId, show.id, show.name);
+    if (show && userId) {
+      const token = await getToken();
+      trackTrailerView(userId, show.id, show.name, token);
     }
   };
 

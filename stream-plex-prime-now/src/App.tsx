@@ -3,10 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
 import Plans from "./pages/Plans";
 import NotFound from "./pages/NotFound";
 import MovieDetails from "./pages/MovieDetails";
@@ -28,25 +30,25 @@ import HelpCenter from "./pages/HelpCenter";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
-import "./services/apiProxy";
+import Profile from "./pages/Profile";
+import ClerkSSOCallback from "./pages/ClerkSSOCallback";
 import React from "react";
 
 const queryClient = new QueryClient();
-
-// Simple auth check - in a real app, you'd use a proper auth system
-const isAuthenticated = () => {
-  return localStorage.getItem('user') !== null;
-};
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
-  return <>{children}</>;
+  return (
+    <>
+      <SignedIn>{children}</SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </>
+  );
 };
 
 const App = () => (
@@ -55,9 +57,19 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
+        <ClerkLoading>
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-muted-foreground">Loading authentication…</div>
+          </div>
+        </ClerkLoading>
+        <ClerkLoaded>
+          <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/login/sso-callback" element={<ClerkSSOCallback />} />
+          <Route path="/signup/sso-callback" element={<ClerkSSOCallback />} />
+          <Route path="/sso-callback" element={<ClerkSSOCallback />} />
           <Route 
             path="/" 
             element={
@@ -139,6 +151,14 @@ const App = () => (
             } 
           />
           <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/archive" 
             element={
               <ProtectedRoute>
@@ -166,8 +186,9 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/cookies" element={<Cookies />} />
           
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ClerkLoaded>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

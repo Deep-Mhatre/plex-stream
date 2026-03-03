@@ -60,6 +60,34 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Environment variables
+
+Create a `.env` file (see `.env.example`) and set:
+
+- `VITE_TMDB_API_KEY` (required)
+- `VITE_TMDB_BEARER_TOKEN` (optional)
+- `VITE_CLERK_PUBLISHABLE_KEY` (required)
+- `CLERK_SECRET_KEY` (required for backend)
+- `CLERK_WEBHOOK_SIGNING_SECRET` (required for Clerk webhooks)
+- `PORT` (optional, backend)
+- `CORS_ORIGIN` (optional, backend)
+- `MONGODB_URI` (required for backend)
+- `MONGODB_DB` (optional, backend)
+
+## Backend (Clerk)
+
+Start the backend:
+
+```sh
+npm run dev:server
+```
+
+Backend endpoints:
+
+- `GET /api/health`
+- `GET /api/me` (requires Clerk auth)
+- `POST /api/webhooks/clerk` (Clerk webhooks)
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/51c4c92f-df4e-4a44-9436-b26ed4d7ee81) and click on Share -> Publish.

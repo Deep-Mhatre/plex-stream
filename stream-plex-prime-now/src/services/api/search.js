@@ -1,18 +1,15 @@
 
 // Search-related TMDB API services
 
-import { BASE_URL, options } from './config';
+import { fetchJson } from './config';
 
 // Search movies and TV shows
 export const searchMoviesAndShows = async (query) => {
   if (!query) return [];
   
   try {
-    const response = await fetch(
-      `${BASE_URL}/search/multi?query=${encodeURIComponent(query)}`,
-      options
-    );
-    const data = await response.json();
+    const data = await fetchJson("/search/multi", { query });
+    if (!data?.results) return [];
     return data.results
       .filter(item => item.media_type === 'movie' || item.media_type === 'tv')
       .map(item => ({

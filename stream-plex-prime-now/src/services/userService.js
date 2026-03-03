@@ -1,29 +1,30 @@
 
 // User-related services for MongoDB tracking
 
+const getWatchlistKey = (userId) => `watchlist:${userId}`;
+
 // Add a movie/show to user's watchlist
-export const addToWatchlist = async (userId, contentId, contentTitle, contentType) => {
+export const addToWatchlist = async (userId, contentId, contentTitle, contentType, authToken) => {
   try {
+    if (!userId || !authToken) return false;
+
     // 1. First update local storage
-    const userDataStr = localStorage.getItem('user');
-    if (userDataStr) {
-      const userData = JSON.parse(userDataStr);
-      const watchlist = userData.watchlist || [];
+    const watchlistKey = getWatchlistKey(userId);
+    const watchlistStr = localStorage.getItem(watchlistKey);
+    const watchlist = watchlistStr ? JSON.parse(watchlistStr) : [];
+    
+    // Check if already in watchlist
+    if (!watchlist.some(item => item.id === contentId)) {
+      // Add to watchlist
+      watchlist.push({
+        id: contentId,
+        title: contentTitle,
+        type: contentType,
+        addedAt: new Date().toISOString()
+      });
       
-      // Check if already in watchlist
-      if (!watchlist.some(item => item.id === contentId)) {
-        // Add to watchlist
-        watchlist.push({
-          id: contentId,
-          title: contentTitle,
-          type: contentType,
-          addedAt: new Date().toISOString()
-        });
-        
-        // Update localStorage
-        userData.watchlist = watchlist;
-        localStorage.setItem('user', JSON.stringify(userData));
-      }
+      // Update localStorage
+      localStorage.setItem(watchlistKey, JSON.stringify(watchlist));
     }
     
     // 2. Then track in MongoDB
@@ -31,6 +32,7 @@ export const addToWatchlist = async (userId, contentId, contentTitle, contentTyp
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify({
         userId,
@@ -50,27 +52,27 @@ export const addToWatchlist = async (userId, contentId, contentTitle, contentTyp
 };
 
 // Remove from watchlist
-export const removeFromWatchlist = async (userId, contentId) => {
+export const removeFromWatchlist = async (userId, contentId, authToken) => {
   try {
+    if (!userId || !authToken) return false;
+
     // 1. First update local storage
-    const userDataStr = localStorage.getItem('user');
-    if (userDataStr) {
-      const userData = JSON.parse(userDataStr);
-      let watchlist = userData.watchlist || [];
-      
-      // Filter out the item
-      watchlist = watchlist.filter(item => item.id !== contentId);
-      
-      // Update localStorage
-      userData.watchlist = watchlist;
-      localStorage.setItem('user', JSON.stringify(userData));
-    }
+    const watchlistKey = getWatchlistKey(userId);
+    const watchlistStr = localStorage.getItem(watchlistKey);
+    let watchlist = watchlistStr ? JSON.parse(watchlistStr) : [];
+    
+    // Filter out the item
+    watchlist = watchlist.filter(item => item.id !== contentId);
+    
+    // Update localStorage
+    localStorage.setItem(watchlistKey, JSON.stringify(watchlist));
     
     // 2. Then track in MongoDB
     const response = await fetch('/api/user-watchlist', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify({
         userId,
@@ -88,12 +90,13 @@ export const removeFromWatchlist = async (userId, contentId) => {
 };
 
 // Get user's watchlist
-export const getUserWatchlist = () => {
+export const getUserWatchlist = (userId) => {
   try {
-    const userDataStr = localStorage.getItem('user');
-    if (userDataStr) {
-      const userData = JSON.parse(userDataStr);
-      return userData.watchlist || [];
+    if (!userId) return [];
+    const watchlistKey = getWatchlistKey(userId);
+    const watchlistStr = localStorage.getItem(watchlistKey);
+    if (watchlistStr) {
+      return JSON.parse(watchlistStr);
     }
     return [];
   } catch (error) {
@@ -103,12 +106,14 @@ export const getUserWatchlist = () => {
 };
 
 // Track user navigation
-export const trackNavigation = async (userId, page) => {
+export const trackNavigation = async (userId, page, authToken) => {
   try {
+    if (!userId || !authToken) return false;
     const response = await fetch('/api/track-view', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify({
         userId,

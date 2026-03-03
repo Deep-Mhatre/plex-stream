@@ -9,6 +9,7 @@ import Footer from '@/components/Footer';
 import { getMovieDetails, getMovieTrailers } from '@/services/tmdbAPI';
 import { trackMovieView, trackTrailerView } from '@/services/userBehaviorService';
 import { toast } from 'sonner';
+import { useAuth } from "@clerk/clerk-react";
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -17,9 +18,7 @@ const MovieDetails = () => {
   const [loading, setLoading] = useState(true);
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [selectedTrailer, setSelectedTrailer] = useState(null);
-
-  // Mock user ID - in a real app, you would get this from authentication
-  const mockUserId = "user123";
+  const { userId, getToken } = useAuth();
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -31,8 +30,9 @@ const MovieDetails = () => {
         setMovie(data);
         
         // Track that the user viewed this movie
-        if (data) {
-          trackMovieView(mockUserId, data.id, data.title);
+        if (data && userId) {
+          const token = await getToken();
+          trackMovieView(userId, data.id, data.title, token);
         }
         
         // Fetch trailers
@@ -49,13 +49,14 @@ const MovieDetails = () => {
     fetchMovie();
   }, [id]);
 
-  const handlePlayTrailer = (trailer) => {
+  const handlePlayTrailer = async (trailer) => {
     setSelectedTrailer(trailer);
     setTrailerOpen(true);
     
     // Track that the user watched a trailer
-    if (movie) {
-      trackTrailerView(mockUserId, movie.id, movie.title);
+    if (movie && userId) {
+      const token = await getToken();
+      trackTrailerView(userId, movie.id, movie.title, token);
     }
   };
 

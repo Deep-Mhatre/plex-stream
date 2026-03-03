@@ -5,12 +5,12 @@
 export { 
   getTrendingMovies,
   getFeaturedMovies,
+  getNowPlayingMovies,
   getTopRatedMovies,
   getMovieDetails,
   getHeroMovie,
   getMovieTrailers,
-  getMoviesByGenre,
-  getBestMoviesOfAllTime
+  getMoviesByGenre
 } from './movies';
 
 // TV Shows

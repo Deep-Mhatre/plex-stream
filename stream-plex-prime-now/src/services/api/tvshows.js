@@ -1,13 +1,13 @@
 
 // TV Show-related TMDB API services
 
-import { BASE_URL, options } from './config';
+import { fetchJson } from './config';
 
 // Get popular TV shows
 export const getPopularTVShows = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/tv/popular`, options);
-    const data = await response.json();
+    const data = await fetchJson("/tv/popular");
+    if (!data?.results) return [];
     return data.results.map(show => ({
       id: show.id,
       title: show.name,
@@ -24,8 +24,8 @@ export const getPopularTVShows = async () => {
 // Get top rated TV shows (top 10)
 export const getTopRatedTVShows = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/tv/top_rated`, options);
-    const data = await response.json();
+    const data = await fetchJson("/tv/top_rated");
+    if (!data?.results) return [];
     return data.results.slice(0, 10).map(show => ({
       id: show.id,
       title: show.name,
@@ -42,8 +42,7 @@ export const getTopRatedTVShows = async () => {
 // Get TV show details
 export const getTVShowDetails = async (id) => {
   try {
-    const response = await fetch(`${BASE_URL}/tv/${id}`, options);
-    return await response.json();
+    return await fetchJson(`/tv/${id}`);
   } catch (error) {
     console.error(`Error fetching TV show details for ID ${id}:`, error);
     return null;
@@ -53,8 +52,8 @@ export const getTVShowDetails = async (id) => {
 // Get TV show trailers
 export const getTVShowTrailers = async (tvId) => {
   try {
-    const response = await fetch(`${BASE_URL}/tv/${tvId}/videos`, options);
-    const data = await response.json();
+    const data = await fetchJson(`/tv/${tvId}/videos`);
+    if (!data?.results) return [];
     
     // Filter for trailers and teasers
     const videos = data.results.filter(video => 

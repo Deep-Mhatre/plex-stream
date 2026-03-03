@@ -1,15 +1,15 @@
 
 // User behavior tracking service for MongoDB
 
-const MONGODB_URI = "mongodb+srv://mhatredeep27:esSRaC9F8CRx8l9b@cluster0.j1cfvr3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
 // Track user view of movie
-export const trackMovieView = async (userId, movieId, movieTitle) => {
+export const trackMovieView = async (userId, movieId, movieTitle, authToken) => {
   try {
+    if (!userId || !authToken) return false;
     const response = await fetch('/api/track-view', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify({
         userId,
@@ -29,12 +29,14 @@ export const trackMovieView = async (userId, movieId, movieTitle) => {
 };
 
 // Track user watching trailer
-export const trackTrailerView = async (userId, movieId, movieTitle) => {
+export const trackTrailerView = async (userId, movieId, movieTitle, authToken) => {
   try {
+    if (!userId || !authToken) return false;
     const response = await fetch('/api/track-view', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify({
         userId,
@@ -54,12 +56,14 @@ export const trackTrailerView = async (userId, movieId, movieTitle) => {
 };
 
 // Track user watching full movie
-export const trackWatchMovie = async (userId, movieId, movieTitle) => {
+export const trackWatchMovie = async (userId, movieId, movieTitle, authToken) => {
   try {
+    if (!userId || !authToken) return false;
     const response = await fetch('/api/track-view', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify({
         userId,
@@ -79,12 +83,14 @@ export const trackWatchMovie = async (userId, movieId, movieTitle) => {
 };
 
 // Track user watching full TV show
-export const trackWatchTVShow = async (userId, showId, showTitle, episode = null) => {
+export const trackWatchTVShow = async (userId, showId, showTitle, episode = null, authToken) => {
   try {
+    if (!userId || !authToken) return false;
     const response = await fetch('/api/track-view', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       },
       body: JSON.stringify({
         userId,
