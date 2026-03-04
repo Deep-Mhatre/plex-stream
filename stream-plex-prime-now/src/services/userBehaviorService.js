@@ -1,11 +1,12 @@
 
 // User behavior tracking service for MongoDB
+import { apiUrl } from "./apiBase";
 
 // Track user view of movie
 export const trackMovieView = async (userId, movieId, movieTitle, authToken) => {
   try {
     if (!userId || !authToken) return false;
-    const response = await fetch('/api/track-view', {
+    const response = await fetch(apiUrl('/api/track-view'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,7 +33,7 @@ export const trackMovieView = async (userId, movieId, movieTitle, authToken) => 
 export const trackTrailerView = async (userId, movieId, movieTitle, authToken) => {
   try {
     if (!userId || !authToken) return false;
-    const response = await fetch('/api/track-view', {
+    const response = await fetch(apiUrl('/api/track-view'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -59,7 +60,7 @@ export const trackTrailerView = async (userId, movieId, movieTitle, authToken) =
 export const trackWatchMovie = async (userId, movieId, movieTitle, authToken) => {
   try {
     if (!userId || !authToken) return false;
-    const response = await fetch('/api/track-view', {
+    const response = await fetch(apiUrl('/api/track-view'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ export const trackWatchMovie = async (userId, movieId, movieTitle, authToken) =>
 export const trackWatchTVShow = async (userId, showId, showTitle, episode = null, authToken) => {
   try {
     if (!userId || !authToken) return false;
-    const response = await fetch('/api/track-view', {
+    const response = await fetch(apiUrl('/api/track-view'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

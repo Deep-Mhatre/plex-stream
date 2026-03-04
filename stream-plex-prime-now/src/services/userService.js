@@ -1,5 +1,6 @@
 
 // User-related services for MongoDB tracking
+import { apiUrl } from "./apiBase";
 
 const getWatchlistKey = (userId) => `watchlist:${userId}`;
 
@@ -28,7 +29,7 @@ export const addToWatchlist = async (userId, contentId, contentTitle, contentTyp
     }
     
     // 2. Then track in MongoDB
-    const response = await fetch('/api/user-watchlist', {
+    const response = await fetch(apiUrl('/api/user-watchlist'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +69,7 @@ export const removeFromWatchlist = async (userId, contentId, authToken) => {
     localStorage.setItem(watchlistKey, JSON.stringify(watchlist));
     
     // 2. Then track in MongoDB
-    const response = await fetch('/api/user-watchlist', {
+    const response = await fetch(apiUrl('/api/user-watchlist'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -109,7 +110,7 @@ export const getUserWatchlist = (userId) => {
 export const trackNavigation = async (userId, page, authToken) => {
   try {
     if (!userId || !authToken) return false;
-    const response = await fetch('/api/track-view', {
+    const response = await fetch(apiUrl('/api/track-view'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/clerk-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { apiUrl } from "@/services/apiBase";
 
 const Profile = () => {
   const { getToken } = useAuth();
@@ -14,7 +15,7 @@ const Profile = () => {
     const loadProfile = async () => {
       try {
         const token = await getToken();
-        const response = await fetch("/api/me", {
+        const response = await fetch(apiUrl("/api/me"), {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
